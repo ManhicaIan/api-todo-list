@@ -3,6 +3,7 @@ package com.manhica.api_todo_list.controllers;
 import com.manhica.api_todo_list.dtos.task.TaskRequest;
 import com.manhica.api_todo_list.dtos.task.TaskResponse;
 import com.manhica.api_todo_list.services.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -27,7 +28,7 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskResponse> saveTask(@RequestBody TaskRequest request){
+    public ResponseEntity<TaskResponse> saveTask(@Valid @RequestBody TaskRequest request){
         URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{id}")
                 .buildAndExpand(request.id()).toUri();
         return ResponseEntity.created(uri).body(taskService.saveTask(request));

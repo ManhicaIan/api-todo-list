@@ -5,9 +5,12 @@ import com.manhica.api_todo_list.dtos.task.TaskResponse;
 import com.manhica.api_todo_list.entities.Task;
 import com.manhica.api_todo_list.entities.TaskStatus;
 import com.manhica.api_todo_list.repositories.TaskRepository;
+import com.manhica.api_todo_list.services.exceptions.ResourceNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.module.ResolutionException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -35,18 +38,26 @@ public class TaskService {
 
     @Transactional
     public TaskResponse updateTask(UUID id, TaskRequest request){
-        Task task = taskRepository.getReferenceById(id);
-        dtoToTaskOnUpdate(task, request);
-        task.setUpdated_at(LocalDateTime.now());
-        return new TaskResponse(taskRepository.save(task));
+        try {
+            Task task = taskRepository.getReferenceById(id);
+            dtoToTaskOnUpdate(task, request);
+            task.setUpdated_at(LocalDateTime.now());
+            return new TaskResponse(taskRepository.save(task));
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Task Not Found");
+        }
     }
 
     @Transactional
     public TaskResponse completeTask(UUID id){
-        Task task = taskRepository.getReferenceById(id);
-        task.setTaskStatus(TaskStatus.COMPLETED);
-        task.setCompleted_at(LocalDateTime.now());
-        return new TaskResponse(taskRepository.save(task));
+        try {
+            Task task = taskRepository.getReferenceById(id);
+            task.setTaskStatus(TaskStatus.COMPLETED);
+            task.setCompleted_at(LocalDateTime.now());
+            return new TaskResponse(taskRepository.save(task));
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Task Not found");
+        }
     }
 
     private void dtoToTask(Task task, TaskRequest request){

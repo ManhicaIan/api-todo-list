@@ -31,17 +31,22 @@ public class Task {
 
     private LocalDateTime due_date;
 
-    @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime created_at;
 
-    @UpdateTimestamp
     private LocalDateTime updated_at;
 
     private LocalDateTime completed_at;
 
     @PrePersist
     protected void onCreate(){
+        created_at = LocalDateTime.now();
+        updated_at = LocalDateTime.now();
         taskStatus = TaskStatus.PENDING;
+    }
+
+    @PreUpdate
+    protected void onUpdate(){
+        updated_at = LocalDateTime.now();
     }
 }
